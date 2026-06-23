@@ -1,0 +1,169 @@
+
+
+from google.colab import files
+
+print("Please upload the 'employee.csv' file:")
+uploaded=files.upload()
+
+import pandas as pd
+emp=pd.read_csv('employee.csv')
+emp.iloc[0:5,0:3]
+
+emp.shape
+
+#it is Header Cleaning
+print(emp.columns.tolist())
+emp.columns=emp.columns.str.strip().str.lower().str.replace("_", "")
+print("Fixed Columns")
+print(emp.columns.tolist())
+
+import matplotlib.pyplot as plt
+
+# Create a simple scatter plot using your emp DataFrame for demonstration
+plt.figure(figsize=(7, 5))
+plt.scatter(emp['age'], emp['salary'])
+plt.title('Age vs Salary with Custom Border')
+plt.xlabel('Age')
+plt.ylabel('Salary')
+
+# Get the current Axes instance to customize the border
+ax = plt.gca()
+
+# Ensure all four spines (borders) are visible and set their properties
+border_color = 'darkblue' # You can change this color
+border_linewidth = 2 # You can change the line width
+
+for spine in ax.spines.values():
+    spine.set_visible(True) # Ensure visibility
+    spine.set_color(border_color)
+    spine.set_linewidth(border_linewidth)
+
+plt.show()
+
+#it is check for duplicated values if any
+emp.duplicated().sum()
+
+#it is check for drop duplictae  values if any
+emp.drop_duplicates()
+emp.iloc[0:3,0:3]
+
+emp.columns
+
+# 4. Feature Selection
+#Adding New Column to Existing Table
+
+emp['SalaryperYearExp']=emp['salary']/emp['yearsofexperience']+1
+emp['SalaryperYearExp'].head(5)
+
+#Removing Columns in a Existing Table
+emp.drop(columns='traininghours')
+print("column Dropped")
+
+emp.groupby(by='performancecategory')['performancecategory'].count()
+
+# Updating column (Example: mapping satisfaction level to numeric for correlation
+performance_mapping = {
+    'Needs Improvement': 1,
+    'Meets Expectations': 2,
+    'Exceeds Expectations': 3,
+    'Outstanding': 4
+}
+
+# 3. Map it to a new numeric column
+emp['performance_numeric'] = emp['performancecategory'].map(performance_mapping)
+emp['performance_numeric'].head()
+
+#5.Descriptive Statistics
+emp.describe()
+
+Information=emp.info()
+
+#Q1: Which department has the highest average salary?
+import pandas as pd
+high_avg_department=emp.groupby('department')['salary'].mean().idxmax()
+high_avg_salary=emp.groupby('department')['salary'].mean().max()
+print(high_avg_department)
+print(high_avg_salary)
+
+#Q2:Distribution of employees across performance categories
+performance_distribution=emp['performancecategory'].value_counts()
+print(performance_distribution)
+
+# Q3: Top 5 highest paid employees
+top5=emp.nlargest(5,'salary')[['name','salary']]
+top5
+
+# Q4: Correlation between Years_of_Experience and Salary
+correlation=(emp['yearsofexperience']).corr(emp['salary'])
+correlation
+
+emp.columns
+
+# Q5: Which gender has a higher average satisfaction score?
+gender_satistaction_gender=emp.groupby('gender')['satisfactionscore'].mean()
+gender_satistaction_gender
+
+# 6.2 Numpy Questions
+# Q1: Median salary across the company
+import numpy as np
+median_salary=np.median(emp['salary'])
+median_salary
+
+# Q2:Standard deviation of Performance_Score
+std_salary=np.std(emp['performancescore'])
+std_salary
+
+# Q3: Percentage of employees eligible for promotion
+promo_eligible_pct = (np.sum(emp['promotioneligible'] == 'Yes') / len(emp)) * 100
+promo_eligible_pct
+
+#1: Salary distribution by Department
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+plt.figure(figsize=(12,5))
+sns.barplot(x='department',y='salary', data=emp,estimator=np.mean,orient='vertical')
+plt.title("Salary distribution by Department")
+plt.xlabel("Departmnet")
+plt.ylabel("Salary")
+plt.show()
+
+#Shows a general upward trend, though there is significant variance within the same age groups depending on the department.
+plt.figure(figsize=(10,6))
+sns.scatterplot(x='age',y='salary',hue='department', data=emp)
+plt.title("Avg Vs Salary")
+plt.xlabel("Age")
+plt.ylabel("Salary")
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+
+#A pie chart confirming that the majority of the workforce "Meets Expectations," while a small fraction is "Unsatisfactory."
+plt.figure(figsize=(10,6))
+plt.pie(emp['performancecategory'].value_counts(), labels=emp['performancecategory'].unique(), autopct='%1.1f%%')
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+
+#salary Distribution of Employees
+import numpy as np
+plt.figure(figsize=(10,5))
+plt.hist(emp['salary'], bins=20, edgecolor='k')
+plt.title("Salary Distribution")
+plt.xlabel("SALARY")
+plt.ylabel("Frequency")
+plt.show()
+
+#5: count of Satisfaction Level vs Performance Category
+plt.figure(figsize=(10,6))
+sns.countplot(x='performancecategory', hue='satisfactionlevel', data=emp)
+plt.xlabel("Performance Category")
+plt.ylabel("Count")
+plt.title("Satisfaction Level vs Performance Category")
+plt.legend(title='satisfactionlevel' ,bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+
+#A horizontal bar chart highlighting which departments are the highest and lowest paying.
+plt.figure(figsize=(10,6))
+sns.barplot(x='salary', y='department', data=emp, orient='h',hue='department' ,palette='viridis')
+plt.xlabel("Salary")
+plt.ylabel("Department")
+plt.show()
